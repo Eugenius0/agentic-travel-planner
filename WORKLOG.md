@@ -83,3 +83,11 @@
 - Verified that `docker compose up -d --build` successfully builds and starts the backend.
 - Confirmed that `/health` returns `{"status":"ok"}` through the Compose-managed container.
 - Established a foundation for adding the frontend as a separate service.
+
+## Travel request API
+
+- Defined a Pydantic schema for destination, trip duration, budget, currency, and interests.
+- Added `POST /api/trips/plan` with automatic request validation.
+- Verified successful requests through FastAPI's interactive API documentation.
+- Added automated tests for valid requests, negative budgets, and empty interests.
+- Confirmed that all four backend tests pass.
