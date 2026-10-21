@@ -5,22 +5,57 @@ from app.main import app
 client = TestClient(app)
 
 
+from unittest.mock import patch
+
+from app.schemas import TravelItinerary
+
+
 def test_plan_trip_valid_request():
     payload = {
-        "destination": "Tokyo, Japan",
-        "duration_days": 7,
-        "budget": 1500,
+        "destination": "Stockholm, Sweden",
+        "duration_days": 2,
+        "budget": 150,
         "currency": "EUR",
-        "interests": ["Nature", "Food", "Culture"],
+        "interests": ["Nature", "Museums"],
     }
 
-    response = client.post("/api/trips/plan", json=payload)
+    mock_itinerary = TravelItinerary(
+        destination="Stockholm, Sweden",
+        currency="EUR",
+        days=[
+            {
+                "day": 1,
+                "activities": [
+                    {
+                        "name": "Vasa Museum",
+                        "description": "Visit the historic warship museum.",
+                        "estimated_cost": 20,
+                    }
+                ],
+            },
+            {
+                "day": 2,
+                "activities": [
+                    {
+                        "name": "Djurgården",
+                        "description": "Explore Stockholm's green spaces.",
+                        "estimated_cost": 0,
+                    }
+                ],
+            },
+        ],
+        total_estimated_cost=20,
+    )
+
+    with patch(
+        "app.main.generate_itinerary", return_value=mock_itinerary
+    ) as mock_generate:
+        response = client.post("/api/trips/plan", json=payload)
 
     assert response.status_code == 200
-    assert response.json() == {
-        "message": "Travel request received successfully",
-        "travel_request": payload,
-    }
+    assert response.json() == mock_itinerary.model_dump()
+
+    mock_generate.assert_called_once()
 
 
 def test_plan_trip_negative_budget():

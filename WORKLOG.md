@@ -100,3 +100,14 @@
 - Integrated LangChain using `langchain-groq`.
 - Created a reusable LLM configuration module.
 - Successfully verified a Groq API request that generated travel recommendations for Stockholm.
+
+## Structured itinerary generation
+
+- Defined Pydantic response schemas for travel itineraries, daily plans, and activities.
+- Integrated LangChain structured output with Groq to generate personalized itineraries.
+- Connected the AI itinerary generator to the FastAPI `/api/trips/plan` endpoint.
+- Configured Docker Compose to load Groq environment variables.
+- Verified successful itinerary generation through the API.
+- Updated API tests to mock LLM responses, keeping tests fast and independent of external services.
+- Confirmed all 4 automated tests pass.
+  ![alt text](image.png)

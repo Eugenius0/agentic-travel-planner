@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from app.schemas import TravelRequest
+from app.schemas import TravelItinerary, TravelRequest
+from app.llm import generate_itinerary
 
 app = FastAPI(
     title="Agentic Travel Planner API",
@@ -14,9 +15,6 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.post("/api/trips/plan")
+@app.post("/api/trips/plan", response_model=TravelItinerary)
 def plan_trip(request: TravelRequest):
-    return {
-        "message": "Travel request received successfully",
-        "travel_request": request.model_dump(),
-    }
+    return generate_itinerary(request)

@@ -1,6 +1,8 @@
 import os
 
 from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage, SystemMessage
+from app.schemas import TravelItinerary, TravelRequest
 
 
 def create_llm() -> ChatGroq:
@@ -17,3 +19,37 @@ def create_llm() -> ChatGroq:
         max_retries=0,
         timeout=30,
     )
+
+
+def generate_itinerary(request: TravelRequest) -> TravelItinerary:
+    llm = create_llm()
+
+    structured_llm = llm.with_structured_output(
+        TravelItinerary,
+        method="function_calling",
+    )
+
+    messages = [
+        SystemMessage(
+            content=(
+                "You are an experienced travel planner. "
+                "Create realistic, personalized travel itineraries. "
+                "Organize activities by day and consider the traveler's interests. "
+                "Estimate activity costs in the requested currency. "
+                "Include exactly the requested number of days. "
+                "Keep estimated activity costs within the provided budget. "
+                "The total_estimated_cost must equal the sum of all activity costs. "
+                "Do not claim that estimated prices are verified or live."
+            )
+        ),
+        HumanMessage(
+            content=(
+                f"Destination: {request.destination}\n"
+                f"Duration: {request.duration_days} days\n"
+                f"Budget: {request.budget} {request.currency}\n"
+                f"Interests: {', '.join(request.interests)}"
+            )
+        ),
+    ]
+
+    return structured_llm.invoke(messages)

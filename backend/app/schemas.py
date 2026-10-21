@@ -34,3 +34,27 @@ class TravelRequest(BaseModel):
         description="Traveler interests",
         examples=[["Nature", "Food", "Culture"]],
     )
+
+
+class Activity(BaseModel):
+    name: str = Field(description="Name of the attraction or activity")
+    description: str = Field(description="Brief description of the activity")
+    estimated_cost: float = Field(
+        ge=0, description="Estimated cost per person in the requested currency"
+    )
+
+
+class DayPlan(BaseModel):
+    day: int = Field(ge=1, description="Day number of the trip")
+    activities: list[Activity] = Field(
+        min_length=1, description="Activities planned for this day"
+    )
+
+
+class TravelItinerary(BaseModel):
+    destination: str
+    currency: str
+    days: list[DayPlan]
+    total_estimated_cost: float = Field(
+        ge=0, description="Total estimated cost of all planned activities"
+    )
