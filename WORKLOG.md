@@ -91,3 +91,12 @@
 - Verified successful requests through FastAPI's interactive API documentation.
 - Added automated tests for valid requests, negative budgets, and empty interests.
 - Confirmed that all four backend tests pass.
+
+## LLM integration
+
+- Selected Groq as the LLM provider and Qwen3.8-27B as the initial model.
+- Configured the API key and model through environment variables.
+- Added `.env.example` for reproducible configuration without exposing credentials.
+- Integrated LangChain using `langchain-groq`.
+- Created a reusable LLM configuration module.
+- Successfully verified a Groq API request that generated travel recommendations for Stockholm.

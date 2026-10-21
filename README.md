@@ -170,11 +170,11 @@ LangGraph Workflow
 - **Uvicorn** serves the FastAPI application using the ASGI interface.
 - **Docker** provides a reproducible backend environment with Python 3.12.
 - **pytest and HTTPX** support automated API testing.
-- **LangChain (planned)** will handle LLM integration and structured model interactions.
-- **LangGraph (planned)** will coordinate stateful planning workflows, conditional routing, and itinerary refinement.
-- **MCP (planned)** will connect the application to external research tools.
-- **Next.js and TypeScript (planned)** will provide the interactive frontend.
-- **Tailwind CSS (planned)** will provide frontend styling.
+- **LangChain** will handle LLM integration and structured model interactions.
+- **LangGraph** will coordinate stateful planning workflows, conditional routing, and itinerary refinement.
+- **MCP** will connect the application to external research tools.
+- **Next.js and TypeScript** will provide the interactive frontend.
+- **Tailwind CSS** will provide frontend styling.
 
 LangGraph was selected because travel planning involves multiple dependent steps rather than a single LLM request. The workflow will be able to evaluate generated itineraries and revise them when necessary.
 
