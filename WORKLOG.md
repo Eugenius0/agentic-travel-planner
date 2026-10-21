@@ -74,3 +74,12 @@
 - Pending: Create the initial Git commit.
 - Pending: Create a public GitHub repository.
 - Pending: Push the project to the `main` branch.
+
+## Docker Compose setup
+
+- Added `compose.yaml` to manage application services.
+- Configured Docker Compose to build and run the FastAPI backend.
+- Enabled automatic container restart unless explicitly stopped.
+- Verified that `docker compose up -d --build` successfully builds and starts the backend.
+- Confirmed that `/health` returns `{"status":"ok"}` through the Compose-managed container.
+- Established a foundation for adding the frontend as a separate service.
