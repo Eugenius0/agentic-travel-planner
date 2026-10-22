@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
@@ -46,19 +46,25 @@ def test_plan_trip_valid_request():
     )
 
     with patch(
-        "app.main.travel_graph.invoke",
+        "app.main.travel_graph.ainvoke",
+        new_callable=AsyncMock,
         return_value={
             "itinerary": mock_itinerary,
             "validation_errors": [],
             "retry_count": 1,
         },
-    ) as mock_invoke:
+    ) as mock_ainvoke:
         response = client.post("/api/trips/plan", json=payload)
 
     assert response.status_code == 200
     assert response.json() == mock_itinerary.model_dump()
 
-    mock_invoke.assert_called_once()
+    mock_ainvoke.assert_awaited_once()
+
+    initial_state = mock_ainvoke.await_args.args[0]
+    assert initial_state["request"].destination == "Stockholm, Sweden"
+    assert initial_state["research_results"] == ""
+    assert initial_state["retry_count"] == 0
 
 
 def test_plan_trip_negative_budget():
@@ -99,13 +105,14 @@ def test_plan_trip_validation_failure():
     }
 
     with patch(
-        "app.main.travel_graph.invoke",
+        "app.main.travel_graph.ainvoke",
+        new_callable=AsyncMock,
         return_value={
             "itinerary": None,
             "validation_errors": ["Estimated cost exceeds budget."],
             "retry_count": 3,
         },
-    ) as mock_invoke:
+    ) as mock_ainvoke:
         response = client.post("/api/trips/plan", json=payload)
 
     assert response.status_code == 422
@@ -114,4 +121,4 @@ def test_plan_trip_validation_failure():
     )
     assert response.json()["detail"]["errors"] == ["Estimated cost exceeds budget."]
 
-    mock_invoke.assert_called_once()
+    mock_ainvoke.assert_awaited_once()

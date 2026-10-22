@@ -3,17 +3,70 @@ from typing import TypedDict
 from app.schemas import TravelItinerary, TravelRequest
 from app.llm import generate_itinerary
 from langgraph.graph import StateGraph, START, END
+import json
+from app.mcp import create_mcp_client
 
 
 class TravelState(TypedDict):
     request: TravelRequest
+    research_results: str
     itinerary: TravelItinerary | None
     validation_errors: list[str]
     retry_count: int
 
 
+async def research_destination_node(state: TravelState) -> dict:
+    request = state["request"]
+
+    client = create_mcp_client()
+    tools = await client.get_tools()
+
+    search_tool = next(tool for tool in tools if tool.name == "tavily_search")
+
+    query = (
+        f"{request.destination} travel attractions "
+        f"{', '.join(request.interests)} "
+        "official admission prices opening hours"
+    )
+
+    result = await search_tool.ainvoke(
+        {
+            "query": query,
+            "search_depth": "basic",
+            "max_results": 5,
+        }
+    )
+
+    sources = []
+
+    for block in result:
+        if block.get("type") != "text":
+            continue
+
+        data = json.loads(block["text"])
+
+        for item in data.get("results", []):
+            sources.append(
+                {
+                    "title": item["title"],
+                    "url": item["url"],
+                    "content": item["content"],
+                }
+            )
+
+    if not sources:
+        raise ValueError("Tavily returned no research sources.")
+
+    return {
+        "research_results": json.dumps(sources),
+    }
+
+
 def generate_itinerary_node(state: TravelState) -> dict:
-    itinerary = generate_itinerary(state["request"])
+    itinerary = generate_itinerary(
+        state["request"],
+        state["research_results"],
+    )
 
     return {
         "itinerary": itinerary,
@@ -80,10 +133,12 @@ def route_after_validation(state: TravelState) -> str:
 def build_travel_graph():
     graph = StateGraph(TravelState)
 
+    graph.add_node("research", research_destination_node)
     graph.add_node("generate", generate_itinerary_node)
     graph.add_node("validate", validate_itinerary_node)
 
-    graph.add_edge(START, "generate")
+    graph.add_edge(START, "research")
+    graph.add_edge("research", "generate")
     graph.add_edge("generate", "validate")
 
     graph.add_conditional_edges(

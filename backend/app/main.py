@@ -21,10 +21,11 @@ travel_graph = build_travel_graph()
 
 
 @app.post("/api/trips/plan", response_model=TravelItinerary)
-def plan_trip(request: TravelRequest):
-    result = travel_graph.invoke(
+async def plan_trip(request: TravelRequest):
+    result = await travel_graph.ainvoke(
         {
             "request": request,
+            "research_results": "",
             "itinerary": None,
             "validation_errors": [],
             "retry_count": 0,

@@ -148,3 +148,14 @@
 - Retrieved attraction information, admission prices, and source URLs.
 - Configured Tavily API access through environment variables.
 - Previously, Qwen generated prices based on its existing knowledge. Now we can provide it with researched information and source URLs
+
+## LangGraph destination research integration
+
+- Added an asynchronous destination research node using Tavily MCP.
+- Extracted relevant source titles, URLs, and content from search results.
+- Integrated research into the LangGraph workflow before itinerary generation.
+- Updated Qwen prompts to use retrieved destination information.
+- Kept research outside the validation retry loop to avoid redundant searches.
+- Updated FastAPI to execute the graph asynchronously.
+- Added mocked asynchronous tests for research integration and API responses.
+- Verified all 8 automated tests pass without external API calls.

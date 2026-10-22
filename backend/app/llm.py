@@ -21,7 +21,10 @@ def create_llm() -> ChatGroq:
     )
 
 
-def generate_itinerary(request: TravelRequest) -> TravelItinerary:
+def generate_itinerary(
+    request: TravelRequest,
+    research_results: str = "",
+) -> TravelItinerary:
     llm = create_llm()
 
     structured_llm = llm.with_structured_output(
@@ -39,6 +42,9 @@ def generate_itinerary(request: TravelRequest) -> TravelItinerary:
                 "Include exactly the requested number of days. "
                 "Keep estimated activity costs within the provided budget. "
                 "The total_estimated_cost must equal the sum of all activity costs. "
+                "Use destination research when available, prioritizing reliable sources. "
+                "Do not invent admission prices or opening hours. "
+                "Treat prices as estimates unless clearly confirmed by a source. "
                 "Do not claim that estimated prices are verified or live."
             )
         ),
@@ -47,7 +53,12 @@ def generate_itinerary(request: TravelRequest) -> TravelItinerary:
                 f"Destination: {request.destination}\n"
                 f"Duration: {request.duration_days} days\n"
                 f"Budget: {request.budget} {request.currency}\n"
-                f"Interests: {', '.join(request.interests)}"
+                f"Interests: {', '.join(request.interests)}\n\n"
+                f"Destination research from web sources:\n"
+                f"{research_results if research_results else 'No research available.'}\n\n"
+                "Use this research to select relevant attractions and activities. "
+                "Prefer researched information over general knowledge. "
+                "Do not invent admission prices or opening hours."
             )
         ),
     ]

@@ -1,7 +1,19 @@
+import asyncio
+import json
 from unittest.mock import patch
 
 from app.graph import build_travel_graph
 from app.schemas import TravelItinerary, TravelRequest
+
+MOCK_RESEARCH = json.dumps(
+    [
+        {
+            "title": "Vasa Museum",
+            "url": "https://www.vasamuseet.se/en",
+            "content": "A museum in Stockholm featuring a historic warship.",
+        }
+    ]
+)
 
 
 def make_request():
@@ -35,14 +47,28 @@ def make_itinerary(cost):
 
 
 def run_graph():
-    return build_travel_graph().invoke(
-        {
-            "request": make_request(),
-            "itinerary": None,
-            "validation_errors": [],
-            "retry_count": 0,
-        }
-    )
+    async def mock_research(state):
+        return {"research_results": MOCK_RESEARCH}
+
+    async def execute():
+        # Mock research before compiling the graph.
+        with patch(
+            "app.graph.research_destination_node",
+            new=mock_research,
+        ):
+            graph = build_travel_graph()
+
+        return await graph.ainvoke(
+            {
+                "request": make_request(),
+                "research_results": "",
+                "itinerary": None,
+                "validation_errors": [],
+                "retry_count": 0,
+            }
+        )
+
+    return asyncio.run(execute())
 
 
 def test_valid_itinerary_first_attempt():
@@ -54,7 +80,12 @@ def test_valid_itinerary_first_attempt():
 
     assert result["validation_errors"] == []
     assert result["retry_count"] == 1
-    mock_generate.assert_called_once()
+    assert result["research_results"] == MOCK_RESEARCH
+
+    mock_generate.assert_called_once_with(
+        make_request(),
+        MOCK_RESEARCH,
+    )
 
 
 def test_invalid_itinerary_then_successful_retry():
@@ -71,6 +102,7 @@ def test_invalid_itinerary_then_successful_retry():
     assert result["retry_count"] == 2
     assert result["itinerary"].total_estimated_cost == 50
     assert mock_generate.call_count == 2
+    assert result["research_results"] == MOCK_RESEARCH
 
 
 def test_invalid_itinerary_exhausts_retries():
@@ -84,3 +116,4 @@ def test_invalid_itinerary_exhausts_retries():
     assert result["validation_errors"]
     assert result["itinerary"].total_estimated_cost == 150
     assert mock_generate.call_count == 3
+    assert result["research_results"] == MOCK_RESEARCH
