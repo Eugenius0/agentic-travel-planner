@@ -129,3 +129,12 @@
 - Updated API tests to mock LangGraph execution without external LLM calls.
 - Verified successful itinerary generation through Docker Compose.
 - Confirmed all 5 automated tests pass.
+
+## LangGraph workflow testing
+
+- Added automated tests for the compiled LangGraph workflow.
+- Verified successful itinerary generation on the first attempt.
+- Verified automatic regeneration after an invalid itinerary.
+- Confirmed generation stops after three unsuccessful attempts.
+- Mocked LLM responses to keep tests deterministic and independent of Groq.
+- Confirmed all 8 automated tests pass.
