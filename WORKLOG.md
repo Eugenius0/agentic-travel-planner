@@ -159,3 +159,10 @@
 - Updated FastAPI to execute the graph asynchronously.
 - Added mocked asynchronous tests for research integration and API responses.
 - Verified all 8 automated tests pass without external API calls.
+
+## End-to-end travel planning verification
+
+- Successfully tested the complete FastAPI, Tavily MCP, Qwen, and LangGraph workflow using Docker Compose.
+- Generated a two-day Stockholm itinerary with six activities based on the requested interests.
+- Confirmed that the generated activity costs total 54 EUR, within the 150 EUR budget.
+- Verified that the API returns a structured itinerary with the correct duration and currency.
