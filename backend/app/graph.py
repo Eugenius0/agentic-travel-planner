@@ -3,8 +3,7 @@ from typing import TypedDict
 from app.schemas import TravelItinerary, TravelRequest
 from app.llm import generate_itinerary
 from langgraph.graph import StateGraph, START, END
-import json
-from app.mcp import create_mcp_client
+from app.research_agent import run_research_agent
 
 
 class TravelState(TypedDict):
@@ -18,48 +17,12 @@ class TravelState(TypedDict):
 async def research_destination_node(state: TravelState) -> dict:
     request = state["request"]
 
-    client = create_mcp_client()
-    tools = await client.get_tools()
-
-    search_tool = next(tool for tool in tools if tool.name == "tavily_search")
-
-    query = (
-        f"{request.destination} travel attractions "
-        f"{', '.join(request.interests)} "
-        "official admission prices opening hours"
+    research_results = await run_research_agent(
+        destination=request.destination,
+        interests=request.interests,
     )
 
-    result = await search_tool.ainvoke(
-        {
-            "query": query,
-            "search_depth": "basic",
-            "max_results": 5,
-        }
-    )
-
-    sources = []
-
-    for block in result:
-        if block.get("type") != "text":
-            continue
-
-        data = json.loads(block["text"])
-
-        for item in data.get("results", []):
-            sources.append(
-                {
-                    "title": item["title"],
-                    "url": item["url"],
-                    "content": item["content"],
-                }
-            )
-
-    if not sources:
-        raise ValueError("Tavily returned no research sources.")
-
-    return {
-        "research_results": json.dumps(sources),
-    }
+    return {"research_results": research_results}
 
 
 def generate_itinerary_node(state: TravelState) -> dict:

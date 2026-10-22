@@ -117,3 +117,45 @@ def test_invalid_itinerary_exhausts_retries():
     assert result["itinerary"].total_estimated_cost == 150
     assert mock_generate.call_count == 3
     assert result["research_results"] == MOCK_RESEARCH
+
+
+def test_research_node_uses_autonomous_agent():
+    import asyncio
+    from unittest.mock import AsyncMock, patch
+
+    from app.graph import research_destination_node
+    from app.schemas import TravelRequest
+
+    request = TravelRequest(
+        destination="Stockholm",
+        duration_days=2,
+        budget=150,
+        currency="EUR",
+        interests=["Nature", "Museums"],
+    )
+
+    mock_research = (
+        "Vasa Museum: maritime museum in Stockholm. "
+        "Source: https://www.vasamuseet.se"
+    )
+
+    async def run_test():
+        with patch(
+            "app.graph.run_research_agent",
+            new_callable=AsyncMock,
+            return_value=mock_research,
+        ) as mocked_agent:
+            result = await research_destination_node(
+                {
+                    "request": request,
+                }
+            )
+
+            mocked_agent.assert_awaited_once_with(
+                destination="Stockholm",
+                interests=["Nature", "Museums"],
+            )
+
+            assert result["research_results"] == mock_research
+
+    asyncio.run(run_test())

@@ -166,3 +166,22 @@
 - Generated a two-day Stockholm itinerary with six activities based on the requested interests.
 - Confirmed that the generated activity costs total 54 EUR, within the 150 EUR budget.
 - Verified that the API returns a structured itinerary with the correct duration and currency.
+
+## Autonomous Research Agent
+
+- Implemented a LangChain research agent using Qwen through Groq.
+- Integrated Tavily MCP for dynamically selected web searches.
+- Added configurable limits for search attempts and agent execution steps.
+- Simplified the search tool schema to improve tool-calling reliability.
+- Added error handling for failed searches and MCP error responses.
+- Reduced token consumption by extracting concise source information.
+- Integrated the Research Agent into the LangGraph travel-planning workflow.
+- Verified the integration with mocked tests.
+- All 13 backend tests passing.
+
+### Known Limitations
+
+- Qwen tool calling can occasionally produce malformed requests.
+- Research quality depends on the reliability of retrieved sources.
+- Groq free-tier rate limits can affect multi-step agent execution.
+- Live end-to-end testing of the newly integrated workflow is still pending.
