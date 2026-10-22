@@ -1,13 +1,11 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.schemas import TravelItinerary
 
 client = TestClient(app)
-
-
-from unittest.mock import patch
-
-from app.schemas import TravelItinerary
 
 
 def test_plan_trip_valid_request():
@@ -48,14 +46,19 @@ def test_plan_trip_valid_request():
     )
 
     with patch(
-        "app.main.generate_itinerary", return_value=mock_itinerary
-    ) as mock_generate:
+        "app.main.travel_graph.invoke",
+        return_value={
+            "itinerary": mock_itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+        },
+    ) as mock_invoke:
         response = client.post("/api/trips/plan", json=payload)
 
     assert response.status_code == 200
     assert response.json() == mock_itinerary.model_dump()
 
-    mock_generate.assert_called_once()
+    mock_invoke.assert_called_once()
 
 
 def test_plan_trip_negative_budget():
@@ -84,3 +87,31 @@ def test_plan_trip_empty_interests():
     response = client.post("/api/trips/plan", json=payload)
 
     assert response.status_code == 422
+
+
+def test_plan_trip_validation_failure():
+    payload = {
+        "destination": "Stockholm, Sweden",
+        "duration_days": 2,
+        "budget": 150,
+        "currency": "EUR",
+        "interests": ["Nature", "Museums"],
+    }
+
+    with patch(
+        "app.main.travel_graph.invoke",
+        return_value={
+            "itinerary": None,
+            "validation_errors": ["Estimated cost exceeds budget."],
+            "retry_count": 3,
+        },
+    ) as mock_invoke:
+        response = client.post("/api/trips/plan", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["detail"]["message"] == (
+        "Could not generate a valid itinerary."
+    )
+    assert response.json()["detail"]["errors"] == ["Estimated cost exceeds budget."]
+
+    mock_invoke.assert_called_once()

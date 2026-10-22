@@ -120,3 +120,12 @@
 - Added validation for trip duration, day ordering, currency, cost totals, and budget limits.
 - Implemented conditional routing with a maximum of three generation attempts.
 - Verified itinerary generation, validation, and routing independently.
+
+## LangGraph API integration
+
+- Connected the FastAPI travel planning endpoint to the LangGraph workflow.
+- Added automatic itinerary regeneration when validation fails, limited to three attempts.
+- Configured the API to return HTTP 422 when itinerary validation fails after all attempts.
+- Updated API tests to mock LangGraph execution without external LLM calls.
+- Verified successful itinerary generation through Docker Compose.
+- Confirmed all 5 automated tests pass.
