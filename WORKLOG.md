@@ -138,3 +138,13 @@
 - Confirmed generation stops after three unsuccessful attempts.
 - Mocked LLM responses to keep tests deterministic and independent of Groq.
 - Confirmed all 8 automated tests pass.
+
+## Tavily MCP integration
+
+- Integrated the LangChain MCP client for external research tools.
+- Configured authenticated access to Tavily's hosted MCP server.
+- Successfully discovered five MCP tools: search, extract, crawl, map, and research.
+- Executed a live destination research query through MCP.
+- Retrieved attraction information, admission prices, and source URLs.
+- Configured Tavily API access through environment variables.
+- Previously, Qwen generated prices based on its existing knowledge. Now we can provide it with researched information and source URLs
