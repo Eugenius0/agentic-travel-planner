@@ -47,6 +47,10 @@ def generate_itinerary(
                 "Do not invent admission prices or opening hours. "
                 "Treat prices as estimates unless clearly confirmed by a source. "
                 "Do not claim that estimated prices are verified or live."
+                "Include a source_url for an activity only when the URL appears "
+                "in the provided destination research and supports that activity. "
+                "Otherwise leave source_url as null. "
+                "Never invent source URLs. "
             )
         ),
         HumanMessage(

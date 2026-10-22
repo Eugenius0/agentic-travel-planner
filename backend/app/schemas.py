@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class TravelRequest(BaseModel):
@@ -37,11 +37,10 @@ class TravelRequest(BaseModel):
 
 
 class Activity(BaseModel):
-    name: str = Field(description="Name of the attraction or activity")
-    description: str = Field(description="Brief description of the activity")
-    estimated_cost: float = Field(
-        ge=0, description="Estimated cost per person in the requested currency"
-    )
+    name: str
+    description: str
+    estimated_cost: float = Field(ge=0)
+    source_url: HttpUrl | None = None
 
 
 class DayPlan(BaseModel):

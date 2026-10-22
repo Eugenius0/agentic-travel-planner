@@ -185,3 +185,11 @@
 - Research quality depends on the reliability of retrieved sources.
 - Groq free-tier rate limits can affect multi-step agent execution.
 - Live end-to-end testing of the newly integrated workflow is still pending.
+
+## Itinerary Quality Improvements
+
+- Added validation coverage for inconsistent itinerary cost totals.
+- Added optional source URLs to itinerary activities.
+- Updated the itinerary generation prompt to use research-backed URLs without inventing sources.
+- Added schema tests for valid, missing, and invalid source URLs.
+- All 17 backend tests passing.

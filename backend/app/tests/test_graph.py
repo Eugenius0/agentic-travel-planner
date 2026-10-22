@@ -159,3 +159,57 @@ def test_research_node_uses_autonomous_agent():
             assert result["research_results"] == mock_research
 
     asyncio.run(run_test())
+
+
+def test_validator_rejects_incorrect_total_cost():
+    from app.graph import validate_itinerary_node
+    from app.schemas import (
+        Activity,
+        DayPlan,
+        TravelItinerary,
+        TravelRequest,
+    )
+
+    request = TravelRequest(
+        destination="Stockholm",
+        duration_days=1,
+        budget=100,
+        currency="EUR",
+        interests=["Museums"],
+    )
+
+    itinerary = TravelItinerary(
+        destination="Stockholm",
+        currency="EUR",
+        days=[
+            DayPlan(
+                day=1,
+                activities=[
+                    Activity(
+                        name="Museum visit",
+                        description="Explore a museum.",
+                        estimated_cost=25,
+                    ),
+                    Activity(
+                        name="Guided tour",
+                        description="Explore the city.",
+                        estimated_cost=30,
+                    ),
+                ],
+            )
+        ],
+        total_estimated_cost=40,
+    )
+
+    result = validate_itinerary_node(
+        {
+            "request": request,
+            "itinerary": itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+            "research_results": "",
+        }
+    )
+
+    assert result["validation_errors"]
+    assert any("total" in error.lower() for error in result["validation_errors"])
