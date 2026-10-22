@@ -111,3 +111,12 @@
 - Updated API tests to mock LLM responses, keeping tests fast and independent of external services.
 - Confirmed all 4 automated tests pass.
   ![alt text](image.png)
+
+## LangGraph workflow
+
+- Integrated LangGraph for stateful travel planning orchestration.
+- Defined shared workflow state for requests, itineraries, validation errors, and retry counts.
+- Implemented itinerary generation and deterministic validation nodes.
+- Added validation for trip duration, day ordering, currency, cost totals, and budget limits.
+- Implemented conditional routing with a maximum of three generation attempts.
+- Verified itinerary generation, validation, and routing independently.
