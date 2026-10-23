@@ -277,3 +277,15 @@
 - Verified the integration without consuming external AI API credits.
 - Restored the LangGraph-powered backend after testing.
   ![alt text](image-2.png)
+
+## Itinerary Results Interface
+
+- Built a reusable React component for generated travel itineraries.
+- Added day-by-day activity cards with descriptions and estimated costs.
+- Implemented daily cost totals and an activity budget overview.
+- Added support for displaying research source links.
+- Integrated itinerary results with the trip planner form.
+- Verified the interface using mocked backend responses.
+- Preserved the existing responsive design system.
+  ![alt text](image-3.png)
+  ![alt text](image-4.png)
