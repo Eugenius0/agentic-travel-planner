@@ -1,14 +1,22 @@
 from fastapi import FastAPI
-
 from app.schemas import TravelItinerary, TravelRequest
 from fastapi import HTTPException
-
 from app.graph import build_travel_graph
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Agentic Travel Planner API",
     description="AI-powered travel planning using LangGraph and MCP",
     version="0.1.0",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
 

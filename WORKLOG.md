@@ -257,3 +257,13 @@
 - Integrated the planner into the homepage above destination discovery.
 - Verified form interactions and responsive layout.
   ![alt text](image-1.png)
+
+## Frontend–Backend Integration
+
+- Created a typed API client for communication with FastAPI.
+- Configured the frontend API URL using environment variables.
+- Enabled CORS for local Next.js development.
+- Connected the trip planner form to the backend endpoint.
+- Added trip duration calculation and input validation.
+- Implemented loading, error, and response states.
+- Verified TypeScript compilation and all 26 backend tests.

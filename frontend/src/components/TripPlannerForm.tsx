@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -9,6 +9,19 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { generateTrip, type TravelItinerary } from "@/lib/api";
+
+const interestOptions = [
+  "Nature",
+  "Food",
+  "Culture",
+  "Museums",
+  "Adventure",
+  "Relaxation",
+];
+
+const inputClass =
+  "w-full rounded-2xl border border-[#dce8ef] bg-white px-4 py-3.5 text-[#253b4b] outline-none transition focus:border-[#477e9d] focus:ring-2 focus:ring-[#477e9d]/10";
 
 export default function TripPlannerForm() {
   const [departureCity, setDepartureCity] = useState("");
@@ -18,16 +31,13 @@ export default function TripPlannerForm() {
   const [travelers, setTravelers] = useState(1);
   const [budget, setBudget] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
-  const [travelStyle, setTravelStyle] = useState("balanced");
+  const [travelStyle, setTravelStyle] = useState<
+    "budget" | "balanced" | "comfort"
+  >("balanced");
 
-  const interestOptions = [
-    "Nature",
-    "Food",
-    "Culture",
-    "Museums",
-    "Adventure",
-    "Relaxation",
-  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [itinerary, setItinerary] = useState<TravelItinerary | null>(null);
 
   function toggleInterest(interest: string) {
     setInterests((current) =>
@@ -37,29 +47,59 @@ export default function TripPlannerForm() {
     );
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    setError(null);
+    setItinerary(null);
+
     if (interests.length === 0) {
-      alert("Please select at least one interest.");
+      setError("Please select at least one interest.");
       return;
     }
 
-    console.log({
-      departure_city: departureCity,
-      destination,
-      start_date: startDate,
-      end_date: endDate,
-      travelers,
-      budget: Number(budget),
-      currency: "EUR",
-      interests,
-      travel_style: travelStyle,
-    });
-  }
+    const start = new Date(`${startDate}T00:00:00Z`);
+    const end = new Date(`${endDate}T00:00:00Z`);
 
-  const inputClass =
-    "w-full rounded-2xl border border-[#dce8ef] bg-white px-4 py-3.5 text-[#253b4b] outline-none transition focus:border-[#477e9d] focus:ring-2 focus:ring-[#477e9d]/10";
+    const durationDays =
+      Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+
+    if (
+      !Number.isFinite(durationDays) ||
+      durationDays < 1 ||
+      durationDays > 30
+    ) {
+      setError("Please select a trip duration between 1 and 30 days.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await generateTrip({
+        departure_city: departureCity.trim(),
+        destination: destination.trim(),
+        start_date: startDate,
+        end_date: endDate,
+        duration_days: durationDays,
+        travelers,
+        budget: Number(budget),
+        currency: "EUR",
+        interests,
+        travel_style: travelStyle,
+      });
+
+      setItinerary(result);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while generating your trip.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <form
@@ -70,10 +110,12 @@ export default function TripPlannerForm() {
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#477e9d] text-white">
           <Sparkles size={23} />
         </div>
+
         <div>
           <h3 className="text-2xl font-semibold tracking-tight text-[#253b4b]">
             Design your next adventure
           </h3>
+
           <p className="text-sm text-[#718696]">
             Tell us what matters. AI will handle the planning.
           </p>
@@ -83,8 +125,10 @@ export default function TripPlannerForm() {
       <div className="grid gap-5 md:grid-cols-2">
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <MapPin size={16} /> Traveling from
+            <MapPin size={16} />
+            Traveling from
           </span>
+
           <input
             required
             value={departureCity}
@@ -96,8 +140,10 @@ export default function TripPlannerForm() {
 
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <MapPin size={16} /> Destination
+            <MapPin size={16} />
+            Destination
           </span>
+
           <input
             required
             value={destination}
@@ -109,8 +155,10 @@ export default function TripPlannerForm() {
 
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <CalendarDays size={16} /> Start date
+            <CalendarDays size={16} />
+            Start date
           </span>
+
           <input
             required
             type="date"
@@ -122,8 +170,10 @@ export default function TripPlannerForm() {
 
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <CalendarDays size={16} /> End date
+            <CalendarDays size={16} />
+            End date
           </span>
+
           <input
             required
             type="date"
@@ -136,8 +186,10 @@ export default function TripPlannerForm() {
 
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <Users size={16} /> Travelers
+            <Users size={16} />
+            Travelers
           </span>
+
           <input
             required
             type="number"
@@ -151,12 +203,15 @@ export default function TripPlannerForm() {
 
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium text-[#253b4b]">
-            <Wallet size={16} /> Total budget (€)
+            <Wallet size={16} />
+            Total budget (€)
           </span>
+
           <input
             required
             type="number"
             min={1}
+            step="0.01"
             value={budget}
             onChange={(event) => setBudget(event.target.value)}
             placeholder="1500"
@@ -169,6 +224,7 @@ export default function TripPlannerForm() {
         <p className="mb-3 text-sm font-medium text-[#253b4b]">
           What are you interested in?
         </p>
+
         <div className="flex flex-wrap gap-2">
           {interestOptions.map((interest) => {
             const selected = interests.includes(interest);
@@ -199,10 +255,15 @@ export default function TripPlannerForm() {
         >
           Travel style
         </label>
+
         <select
           id="travel-style"
           value={travelStyle}
-          onChange={(event) => setTravelStyle(event.target.value)}
+          onChange={(event) =>
+            setTravelStyle(
+              event.target.value as "budget" | "balanced" | "comfort",
+            )
+          }
           className={inputClass}
         >
           <option value="budget">Budget-friendly</option>
@@ -213,11 +274,52 @@ export default function TripPlannerForm() {
 
       <button
         type="submit"
-        className="mt-9 flex w-full items-center justify-center gap-3 rounded-full bg-[#477e9d] px-7 py-4 font-semibold text-white transition hover:bg-[#356783]"
+        disabled={isLoading}
+        className="mt-9 flex w-full items-center justify-center gap-3 rounded-full bg-[#477e9d] px-7 py-4 font-semibold text-white transition hover:bg-[#356783] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Generate my trip
-        <ArrowUpRight size={19} />
+        {isLoading ? (
+          <>
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+            Researching and planning your trip...
+          </>
+        ) : (
+          <>
+            Generate my trip
+            <ArrowUpRight size={19} />
+          </>
+        )}
       </button>
+
+      {error && (
+        <p role="alert" className="mt-4 text-center text-sm text-red-600">
+          {error}
+        </p>
+      )}
+
+      {itinerary && (
+        <div
+          role="status"
+          className="mt-6 rounded-2xl border border-[#dce8ef] bg-white p-6"
+        >
+          <h4 className="text-xl font-semibold text-[#253b4b]">
+            Your {itinerary.destination} itinerary is ready!
+          </h4>
+
+          <p className="mt-2 text-sm text-[#718696]">
+            {itinerary.days.length} days planned
+          </p>
+
+          <p className="mt-1 text-sm text-[#718696]">
+            Estimated activity costs: {itinerary.total_estimated_cost}{" "}
+            {itinerary.currency}
+          </p>
+
+          <p className="mt-2 text-xs text-[#718696]">
+            Accommodation, meals, and transportation are not included in this
+            estimate yet.
+          </p>
+        </div>
+      )}
     </form>
   );
 }
