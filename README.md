@@ -30,33 +30,31 @@ preferences through the responsive web interface.
 
 ![Travel planning interface](images/image-11.png)
 
-### 2. Personalized Trip Configuration
-
-Customize the trip to match your travel style and preferences before
-starting the AI-powered planning process.
-
-![Personalized trip configuration](images/image-12.png)
-
-### 3. AI-Generated Itinerary
-
-Explore a personalized itinerary with recommended activities,
-descriptions, and supporting research sources.
-
-![AI-generated travel itinerary](images/image-10.png)
-
-### 4. Complete Budget Breakdown
-
-Review estimated costs for transportation, accommodation, food,
-activities, and local transport, validated against the trip budget.
-
-![Travel budget breakdown](images/image-13.png)
-
-### 5. Day-by-Day Travel Plan
+### 2. Day-by-Day Travel Plan
 
 Follow a structured travel schedule with activities tailored to
 your selected interests and available budget.
 
-![Day-by-day itinerary](images/image-14.png)
+![Day-by-day itinerary](images/image-13.png)
+
+### 3. Complete Budget Breakdown
+
+Review estimated costs for transportation, accommodation, food,
+activities, and local transport, validated against the trip budget.
+
+![Travel budget breakdown](images/image-14.png)
+
+### 4. Explore Destinations
+
+Discover inspiring destinations from around the world. Browse featured cities and locations to find ideas for your next adventure.
+
+![Explore destinations](images/image-12.png)
+
+### 5. How It Works
+
+Learn how the Agentic Travel Planner uses AI agents, real-time destination research, and automated validation to generate personalized itineraries that respect your travel budget.
+
+![How It Works page](images/image-10.png)
 
 ## Quick Start
 
