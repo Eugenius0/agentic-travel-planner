@@ -193,3 +193,12 @@
 - Updated the itinerary generation prompt to use research-backed URLs without inventing sources.
 - Added schema tests for valid, missing, and invalid source URLs.
 - All 17 backend tests passing.
+
+## Full-Trip Budget Foundation
+
+- Extended travel requests with departure city, travel dates, traveler count, and travel style.
+- Added date validation and preserved compatibility with existing requests.
+- Introduced a structured trip cost breakdown covering transportation, accommodation, food, activities, and local transportation.
+- Added an optional cost breakdown to itinerary responses.
+- Added automated tests for travel requests and cost calculations.
+- All 23 backend tests passing.

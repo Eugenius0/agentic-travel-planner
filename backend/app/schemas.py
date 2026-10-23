@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, model_validator
+from datetime import date
+from typing import Literal
 
 
 class TravelRequest(BaseModel):
@@ -17,7 +19,7 @@ class TravelRequest(BaseModel):
 
     budget: float = Field(
         gt=0,
-        description="Total travel budget",
+        description="Activity budget",
         examples=[1500],
     )
 
@@ -35,12 +37,51 @@ class TravelRequest(BaseModel):
         examples=[["Nature", "Food", "Culture"]],
     )
 
+    departure_city: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    travelers: int = Field(default=1, ge=1, le=20)
+    travel_style: Literal["budget", "balanced", "comfort"] = "balanced"
+
+    @model_validator(mode="after")
+    def validate_travel_dates(self):
+        if (self.start_date is None) != (self.end_date is None):
+            raise ValueError("Provide both start_date and end_date.")
+
+        if self.start_date is not None and self.end_date is not None:
+            if self.end_date < self.start_date:
+                raise ValueError("end_date must not be before start_date.")
+
+            if (self.end_date - self.start_date).days + 1 != self.duration_days:
+                raise ValueError("Travel dates must match duration_days.")
+
+        return self
+
 
 class Activity(BaseModel):
     name: str
     description: str
     estimated_cost: float = Field(ge=0)
     source_url: HttpUrl | None = None
+
+
+class TripCostBreakdown(BaseModel):
+    transportation: float = Field(ge=0)
+    accommodation: float = Field(ge=0)
+    food: float = Field(ge=0)
+    activities: float = Field(ge=0)
+    local_transportation: float = Field(ge=0)
+
+    @property
+    def total(self) -> float:
+        return round(
+            self.transportation
+            + self.accommodation
+            + self.food
+            + self.activities
+            + self.local_transportation,
+            2,
+        )
 
 
 class DayPlan(BaseModel):
@@ -57,3 +98,4 @@ class TravelItinerary(BaseModel):
     total_estimated_cost: float = Field(
         ge=0, description="Total estimated cost of all planned activities"
     )
+    cost_breakdown: TripCostBreakdown | None = None
