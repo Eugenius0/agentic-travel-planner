@@ -316,3 +316,14 @@
 - Added separate food and activity expense categorization.
 - Updated budget validation to prevent meal expenses from being incorrectly allocated to activities.
 - Added regression tests for expense categorization and food budget validation.
+
+### MVP Reliability and Docker Compose Integration
+
+- Added error handling for Groq rate limits, API timeouts, connection failures, and unexpected backend errors.
+- Verified backend functionality with automated pytest tests.
+- Added regression tests for food and activity budget categorization.
+- Added a production Dockerfile and .dockerignore for the Next.js frontend.
+- Extended Docker Compose to run both frontend and backend services.
+- Configured environment variables and frontend API connectivity.
+- Successfully built and started both services using Docker Compose.
+- Next: finalize README documentation and complete MVP verification.
