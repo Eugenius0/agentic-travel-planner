@@ -13,7 +13,7 @@
 
 **Additional technologies:** Groq, Tavily, Model Context Protocol (MCP), Pydantic, pytest.
 
-## Demo
+## Video demo
 
 Watch the Agentic Travel Planner generate a personalized day trip
 from Stockholm to Uppsala, including AI-powered destination research,
@@ -57,41 +57,6 @@ Stop with `docker compose down`.
 - **Automatic validation and refinement** using LangGraph, with up to three generation attempts.
 - **Research source links** for activities when supporting URLs are available.
 - **Responsive web interface** with daily itineraries and visual budget breakdowns.
-
-## Application Screenshots
-
-### 1. Travel Planner
-
-Enter your destination, travel dates, budget, interests, and travel
-preferences through the responsive web interface.
-
-![Travel planning interface](images/image-11.png)
-
-### 2. Day-by-Day Travel Plan
-
-Follow a structured travel schedule with activities tailored to
-your selected interests and available budget.
-
-![Day-by-day itinerary](images/image-13.png)
-
-### 3. Complete Budget Breakdown
-
-Review estimated costs for transportation, accommodation, food,
-activities, and local transport, validated against the trip budget.
-
-![Travel budget breakdown](images/image-14.png)
-
-### 4. Explore Destinations
-
-Discover inspiring destinations from around the world. Browse featured cities and locations to find ideas for your next adventure.
-
-![Explore destinations](images/image-12.png)
-
-### 5. How It Works
-
-Learn how the Agentic Travel Planner uses AI agents, real-time destination research, and automated validation to generate personalized itineraries that respect your travel budget.
-
-![How It Works page](images/image-10.png)
 
 ## How It Works
 
@@ -150,3 +115,38 @@ Travel costs are AI-generated estimates, not live booking quotes. Research accur
 ---
 
 Development history and technical decisions are documented in [WORKLOG.md](WORKLOG.md).
+
+## Application Screenshots
+
+### 1. Travel Planner
+
+Enter your destination, travel dates, budget, interests, and travel
+preferences through the responsive web interface.
+
+![Travel planning interface](images/image-11.png)
+
+### 2. Day-by-Day Travel Plan
+
+Follow a structured travel schedule with activities tailored to
+your selected interests and available budget.
+
+![Day-by-day itinerary](images/image-13.png)
+
+### 3. Complete Budget Breakdown
+
+Review estimated costs for transportation, accommodation, food,
+activities, and local transport, validated against the trip budget.
+
+![Travel budget breakdown](images/image-14.png)
+
+### 4. Explore Destinations
+
+Discover inspiring destinations from around the world. Browse featured cities and locations to find ideas for your next adventure.
+
+![Explore destinations](images/image-12.png)
+
+### 5. How It Works
+
+Learn how the Agentic Travel Planner uses AI agents, real-time destination research, and automated validation to generate personalized itineraries that respect your travel budget.
+
+![How It Works page](images/image-10.png)
