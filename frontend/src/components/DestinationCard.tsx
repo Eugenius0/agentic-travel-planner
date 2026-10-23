@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight, MapPin } from "lucide-react";
 
 type DestinationCardProps = {
@@ -15,7 +16,11 @@ export default function DestinationCard({
   description,
 }: DestinationCardProps) {
   return (
-    <article className="group overflow-hidden rounded-[28px] border border-[#dce8ef] bg-white p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#477e9d]/10">
+    <Link
+      href={`/?destination=${encodeURIComponent(`${name}, ${country}`)}#plan`}
+      aria-label={`Plan a trip to ${name}, ${country}`}
+      className="group block overflow-hidden rounded-[28px] border border-[#dce8ef] bg-white p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#477e9d]/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#477e9d]"
+    >
       <div className="relative h-56 overflow-hidden rounded-[20px] bg-[#d5eaf5]">
         <Image
           src={image}
@@ -48,6 +53,6 @@ export default function DestinationCard({
           <ArrowUpRight size={19} />
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

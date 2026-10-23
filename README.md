@@ -84,7 +84,13 @@ flowchart TD
 
 ## Testing
 
-Backend tests cover API behavior, data validation, workflow transitions, and budget consistency. External AI services are mocked in automated tests.
+The application has been verified through **automated tests and successful live end-to-end testing**.
+
+- **Automated tests:** Cover API behavior, schema validation, LangGraph workflow transitions, budget consistency, and expense categorization. External AI services are mocked for reliable, repeatable testing.
+- **Live integration tests:** Successfully verified the complete workflow, including real Groq LLM calls, Tavily MCP research, itinerary generation, budget validation, and frontend rendering.
+- **Docker verification:** Successfully built and started both frontend and backend using Docker Compose.
+
+Run backend tests:
 
 ```bash
 cd backend

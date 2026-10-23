@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -28,6 +28,16 @@ const inputClass =
 export default function TripPlannerForm() {
   const [departureCity, setDepartureCity] = useState("");
   const [destination, setDestination] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const selectedDestination = params.get("destination");
+
+    if (selectedDestination) {
+      setDestination(selectedDestination);
+    }
+  }, []);
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [travelers, setTravelers] = useState(1);
