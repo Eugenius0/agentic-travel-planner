@@ -6,7 +6,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from app.schemas import TravelItinerary, TravelRequest
 
 
-def create_llm() -> ChatGroq:
+def create_llm(max_tokens: int = 700) -> ChatGroq:
     api_key = os.getenv("GROQ_API_KEY")
     model = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
 
@@ -17,8 +17,8 @@ def create_llm() -> ChatGroq:
         model=model,
         api_key=api_key,
         temperature=0,
-        max_tokens=1800,
-        max_retries=0,
+        max_tokens=max_tokens,
+        max_retries=3,
         timeout=30,
     )
 

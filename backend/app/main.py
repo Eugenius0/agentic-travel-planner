@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,6 +21,8 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
+
+load_dotenv()
 
 travel_graph = build_travel_graph()
 

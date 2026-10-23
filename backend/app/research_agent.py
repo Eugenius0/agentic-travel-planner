@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from app.llm import create_llm
 from app.mcp import create_mcp_client
 
-MAX_RESEARCH_SEARCHES = 3
+MAX_RESEARCH_SEARCHES = 1
 MAX_AGENT_STEPS = 12
 
 
@@ -107,7 +107,7 @@ async def create_research_agent():
         args_schema=ResearchSearchInput,
     )
 
-    return create_llm(), [limited_tool]
+    return create_llm(max_tokens=250), [limited_tool]
 
 
 async def run_research_agent(
