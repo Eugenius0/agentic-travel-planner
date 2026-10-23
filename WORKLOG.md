@@ -110,7 +110,7 @@
 - Verified successful itinerary generation through the API.
 - Updated API tests to mock LLM responses, keeping tests fast and independent of external services.
 - Confirmed all 4 automated tests pass.
-  ![alt text](./images/image.png)
+  ![alt text](./frontend/public/images/image.png)
 
 ## LangGraph workflow
 
@@ -224,7 +224,7 @@
 - Created a reusable navigation component using Next.js and Lucide React.
 - Implemented the initial responsive homepage with branding and introductory content.
 - Verified the frontend renders successfully in development.
-  ![alt text](./images/image-1.png)
+  ![alt text](./frontend/public/images/image-1.png)
 
 ## Homepage Landing Section
 
@@ -233,3 +233,16 @@
 - Integrated Next.js Image for optimized image rendering.
 - Organized static assets under `frontend/public/images/`.
 - Verified the homepage renders successfully.
+
+## Destination Discovery
+
+- Created a reusable destination card component with photography, location details, and hover interactions.
+- Added the initial Discover section to the homepage.
+- Established the homepage structure around trip planning, destination discovery, and product information.
+
+## Destination Discovery Expansion
+
+- Expanded the Discover section to six destinations across different climates and cultures.
+- Added destination photography and reusable card data.
+- Implemented a responsive grid for destination discovery.
+- Identified card sizing and layout issues for the next UI refinement.
