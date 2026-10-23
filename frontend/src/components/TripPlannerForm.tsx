@@ -40,6 +40,7 @@ export default function TripPlannerForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itinerary, setItinerary] = useState<TravelItinerary | null>(null);
+  const [submittedBudget, setSubmittedBudget] = useState<number | null>(null);
 
   function toggleInterest(interest: string) {
     setInterests((current) =>
@@ -54,6 +55,7 @@ export default function TripPlannerForm() {
 
     setError(null);
     setItinerary(null);
+    setSubmittedBudget(null);
 
     if (interests.length === 0) {
       setError("Please select at least one interest.");
@@ -92,6 +94,7 @@ export default function TripPlannerForm() {
       });
 
       setItinerary(result);
+      setSubmittedBudget(Number(budget));
     } catch (err) {
       setError(
         err instanceof Error
@@ -300,7 +303,9 @@ export default function TripPlannerForm() {
         )}
       </form>
 
-      {itinerary && <ItineraryResults itinerary={itinerary} />}
+      {itinerary && submittedBudget !== null && (
+        <ItineraryResults itinerary={itinerary} budget={submittedBudget} />
+      )}
     </>
   );
 }

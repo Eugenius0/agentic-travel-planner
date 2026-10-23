@@ -1,9 +1,19 @@
 import asyncio
 import json
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
-from app.graph import build_travel_graph
-from app.schemas import TravelItinerary, TravelRequest
+from app.graph import (
+    build_travel_graph,
+    research_destination_node,
+    validate_itinerary_node,
+)
+from app.schemas import (
+    Activity,
+    DayPlan,
+    TravelItinerary,
+    TravelRequest,
+    TripCostBreakdown,
+)
 
 MOCK_RESEARCH = json.dumps(
     [
@@ -31,18 +41,26 @@ def make_itinerary(cost):
         destination="Stockholm, Sweden",
         currency="EUR",
         days=[
-            {
-                "day": 1,
-                "activities": [
-                    {
-                        "name": "Vasa Museum",
-                        "description": "Visit the historic warship museum.",
-                        "estimated_cost": cost,
-                    }
+            DayPlan(
+                day=1,
+                activities=[
+                    Activity(
+                        name="Vasa Museum",
+                        description="Visit the historic warship museum.",
+                        estimated_cost=cost,
+                    )
                 ],
-            }
+            )
         ],
         total_estimated_cost=cost,
+        budget_scope="full_trip",
+        cost_breakdown=TripCostBreakdown(
+            transportation=10,
+            accommodation=15,
+            food=10,
+            activities=cost,
+            local_transportation=5,
+        ),
     )
 
 
@@ -82,9 +100,13 @@ def test_valid_itinerary_first_attempt():
     assert result["retry_count"] == 1
     assert result["research_results"] == MOCK_RESEARCH
 
+    assert result["itinerary"].budget_scope == "full_trip"
+    assert result["itinerary"].cost_breakdown.total == 90
+
     mock_generate.assert_called_once_with(
         make_request(),
         MOCK_RESEARCH,
+        validation_errors=[],
     )
 
 
@@ -101,6 +123,7 @@ def test_invalid_itinerary_then_successful_retry():
     assert result["validation_errors"] == []
     assert result["retry_count"] == 2
     assert result["itinerary"].total_estimated_cost == 50
+    assert result["itinerary"].cost_breakdown.total == 90
     assert mock_generate.call_count == 2
     assert result["research_results"] == MOCK_RESEARCH
 
@@ -115,17 +138,12 @@ def test_invalid_itinerary_exhausts_retries():
     assert result["retry_count"] == 3
     assert result["validation_errors"]
     assert result["itinerary"].total_estimated_cost == 150
+    assert result["itinerary"].cost_breakdown.total == 190
     assert mock_generate.call_count == 3
     assert result["research_results"] == MOCK_RESEARCH
 
 
 def test_research_node_uses_autonomous_agent():
-    import asyncio
-    from unittest.mock import AsyncMock, patch
-
-    from app.graph import research_destination_node
-    from app.schemas import TravelRequest
-
     request = TravelRequest(
         destination="Stockholm",
         duration_days=2,
@@ -162,14 +180,6 @@ def test_research_node_uses_autonomous_agent():
 
 
 def test_validator_rejects_incorrect_total_cost():
-    from app.graph import validate_itinerary_node
-    from app.schemas import (
-        Activity,
-        DayPlan,
-        TravelItinerary,
-        TravelRequest,
-    )
-
     request = TravelRequest(
         destination="Stockholm",
         duration_days=1,
@@ -199,6 +209,14 @@ def test_validator_rejects_incorrect_total_cost():
             )
         ],
         total_estimated_cost=40,
+        budget_scope="full_trip",
+        cost_breakdown=TripCostBreakdown(
+            transportation=10,
+            accommodation=10,
+            food=10,
+            activities=55,
+            local_transportation=5,
+        ),
     )
 
     result = validate_itinerary_node(
@@ -211,20 +229,13 @@ def test_validator_rejects_incorrect_total_cost():
         }
     )
 
-    assert result["validation_errors"]
-    assert any("total" in error.lower() for error in result["validation_errors"])
+    assert any(
+        "reported activity total" in error.lower()
+        for error in result["validation_errors"]
+    )
 
 
 def test_validator_rejects_full_trip_over_budget():
-    from app.graph import validate_itinerary_node
-    from app.schemas import (
-        Activity,
-        DayPlan,
-        TravelItinerary,
-        TravelRequest,
-        TripCostBreakdown,
-    )
-
     request = TravelRequest(
         destination="Rome",
         duration_days=1,
@@ -249,6 +260,7 @@ def test_validator_rejects_full_trip_over_budget():
             )
         ],
         total_estimated_cost=25,
+        budget_scope="full_trip",
         cost_breakdown=TripCostBreakdown(
             transportation=200,
             accommodation=300,
@@ -269,20 +281,12 @@ def test_validator_rejects_full_trip_over_budget():
     )
 
     assert any(
-        "total trip cost" in error.lower() for error in result["validation_errors"]
+        "full trip cost" in error.lower() and "exceeds" in error.lower()
+        for error in result["validation_errors"]
     )
 
 
 def test_validator_rejects_mismatched_activity_subtotal():
-    from app.graph import validate_itinerary_node
-    from app.schemas import (
-        Activity,
-        DayPlan,
-        TravelItinerary,
-        TravelRequest,
-        TripCostBreakdown,
-    )
-
     request = TravelRequest(
         destination="Rome",
         duration_days=1,
@@ -307,11 +311,12 @@ def test_validator_rejects_mismatched_activity_subtotal():
             )
         ],
         total_estimated_cost=25,
+        budget_scope="full_trip",
         cost_breakdown=TripCostBreakdown(
             transportation=200,
             accommodation=300,
             food=100,
-            activities=50,  # Incorrect: actual activity cost is 25
+            activities=50,
             local_transportation=30,
         ),
     )
@@ -330,3 +335,42 @@ def test_validator_rejects_mismatched_activity_subtotal():
         "activity costs in the breakdown" in error.lower()
         for error in result["validation_errors"]
     )
+
+
+def test_validator_rejects_missing_full_trip_breakdown():
+    request = make_request()
+
+    itinerary = make_itinerary(50).model_copy(update={"cost_breakdown": None})
+
+    result = validate_itinerary_node(
+        {
+            "request": request,
+            "itinerary": itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+            "research_results": "",
+        }
+    )
+
+    assert any(
+        "cost breakdown is missing" in error.lower()
+        for error in result["validation_errors"]
+    )
+
+
+def test_validator_rejects_activity_only_scope():
+    request = make_request()
+
+    itinerary = make_itinerary(50).model_copy(update={"budget_scope": "activities"})
+
+    result = validate_itinerary_node(
+        {
+            "request": request,
+            "itinerary": itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+            "research_results": "",
+        }
+    )
+
+    assert any("budget_scope" in error.lower() for error in result["validation_errors"])

@@ -289,3 +289,11 @@
 - Preserved the existing responsive design system.
   ![alt text](image-3.png)
   ![alt text](image-4.png)
+
+### Complete Trip Budgeting
+
+- Extended itinerary generation to estimate transportation, accommodation, food, activities, and local transportation.
+- Added full-trip budget validation and feedback-driven LangGraph retries.
+- Updated the frontend with a complete cost breakdown, budget progress indicator, and remaining budget.
+- Verified backend tests (30 passed), TypeScript, and ESLint.
+  ![alt text](image-5.png)

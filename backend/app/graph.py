@@ -1,9 +1,13 @@
 from typing import TypedDict
 
+from langgraph.graph import StateGraph, START, END
+
 from app.schemas import TravelItinerary, TravelRequest
 from app.llm import generate_itinerary
-from langgraph.graph import StateGraph, START, END
 from app.research_agent import run_research_agent
+
+MAX_GENERATION_ATTEMPTS = 3
+COST_TOLERANCE = 0.01
 
 
 class TravelState(TypedDict):
@@ -29,6 +33,7 @@ def generate_itinerary_node(state: TravelState) -> dict:
     itinerary = generate_itinerary(
         state["request"],
         state["research_results"],
+        validation_errors=state["validation_errors"],
     )
 
     return {
@@ -41,11 +46,12 @@ def generate_itinerary_node(state: TravelState) -> dict:
 def validate_itinerary_node(state: TravelState) -> dict:
     request = state["request"]
     itinerary = state["itinerary"]
-    errors = []
+    errors: list[str] = []
 
     if itinerary is None:
         return {"validation_errors": ["No itinerary was generated."]}
 
+    # Validate itinerary duration and day numbering.
     if len(itinerary.days) != request.duration_days:
         errors.append(
             f"Expected {request.duration_days} days, "
@@ -58,44 +64,55 @@ def validate_itinerary_node(state: TravelState) -> dict:
     if actual_days != expected_days:
         errors.append("Day numbers are incorrect or out of order.")
 
+    # Validate currency.
     if itinerary.currency.upper() != request.currency.upper():
         errors.append("Itinerary currency does not match the request.")
 
-    actual_total = sum(
-        activity.estimated_cost for day in itinerary.days for activity in day.activities
+    # Calculate the actual cost of all planned activities.
+    actual_activity_total = round(
+        sum(
+            activity.estimated_cost
+            for day in itinerary.days
+            for activity in day.activities
+        ),
+        2,
     )
 
-    if abs(actual_total - itinerary.total_estimated_cost) > 0.01:
+    # total_estimated_cost represents activities only.
+    if abs(actual_activity_total - itinerary.total_estimated_cost) > COST_TOLERANCE:
         errors.append(
-            f"Reported total {itinerary.total_estimated_cost} "
-            f"does not match calculated total {actual_total:.2f}."
+            f"Reported activity total "
+            f"{itinerary.total_estimated_cost:.2f} "
+            f"does not match calculated activity total "
+            f"{actual_activity_total:.2f}."
         )
 
-    if actual_total > request.budget:
-        errors.append(
-            f"Estimated cost {actual_total:.2f} exceeds "
-            f"budget {request.budget:.2f}."
-        )
+    # Complete trip budgeting is required for the new workflow.
+    if itinerary.budget_scope != "full_trip":
+        errors.append("Itinerary must use budget_scope='full_trip'.")
 
-    if itinerary.cost_breakdown is not None:
+    if itinerary.cost_breakdown is None:
+        errors.append("Complete trip cost breakdown is missing.")
+    else:
         costs = itinerary.cost_breakdown
 
-        if abs(costs.activities - actual_total) > 0.01:
+        # Ensure the activities category matches the itinerary.
+        if abs(costs.activities - actual_activity_total) > COST_TOLERANCE:
             errors.append(
                 "Activity costs in the breakdown do not match "
                 "the itinerary activity total."
             )
 
-        if costs.total > request.budget + 0.01:
+        # Validate the complete trip cost against the user's budget.
+        if costs.total > request.budget + COST_TOLERANCE:
             errors.append(
-                f"Total trip cost ({costs.total}) exceeds "
-                f"the budget ({request.budget})."
+                f"Estimated full trip cost "
+                f"{costs.total:.2f} {request.currency} "
+                f"exceeds the budget of "
+                f"{request.budget:.2f} {request.currency}."
             )
 
     return {"validation_errors": errors}
-
-
-MAX_GENERATION_ATTEMPTS = 3
 
 
 def route_after_validation(state: TravelState) -> str:

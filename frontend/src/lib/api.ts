@@ -37,6 +37,7 @@ export type TravelItinerary = {
   days: DayPlan[];
   total_estimated_cost: number;
   cost_breakdown: TripCostBreakdown | null;
+  budget_scope: "activities" | "full_trip";
 };
 
 export async function generateTrip(

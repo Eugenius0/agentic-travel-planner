@@ -95,7 +95,18 @@ class TravelItinerary(BaseModel):
     destination: str
     currency: str
     days: list[DayPlan]
+
     total_estimated_cost: float = Field(
-        ge=0, description="Total estimated cost of all planned activities"
+        ge=0,
+        description="Total estimated cost of all planned activities",
     )
-    cost_breakdown: TripCostBreakdown | None = None
+
+    cost_breakdown: TripCostBreakdown | None = Field(
+        default=None,
+        description="Estimated full-trip costs across all categories",
+    )
+
+    budget_scope: Literal["activities", "full_trip"] = Field(
+        default="activities",
+        description="Indicates whether the estimate covers activities only or the full trip",
+    )
