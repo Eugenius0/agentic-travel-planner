@@ -1,8 +1,8 @@
-from fastapi import FastAPI
-from app.schemas import TravelItinerary, TravelRequest
-from fastapi import HTTPException
-from app.graph import build_travel_graph
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.graph import build_travel_graph
+from app.schemas import Activity, DayPlan, TravelItinerary, TravelRequest
 
 app = FastAPI(
     title="Agentic Travel Planner API",
@@ -10,22 +10,23 @@ app = FastAPI(
     version="0.1.0",
 )
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
 
+travel_graph = build_travel_graph()
+
 
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
-
-travel_graph = build_travel_graph()
 
 
 @app.post("/api/trips/plan", response_model=TravelItinerary)

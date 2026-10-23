@@ -267,3 +267,13 @@
 - Added trip duration calculation and input validation.
 - Implemented loading, error, and response states.
 - Verified TypeScript compilation and all 26 backend tests.
+
+## Frontend–Backend Integration Verification
+
+- Verified communication between Next.js and FastAPI.
+- Resolved CORS preflight handling for local development.
+- Tested trip submission using a temporary mocked backend response.
+- Confirmed correct travel duration calculation and API response rendering.
+- Verified the integration without consuming external AI API credits.
+- Restored the LangGraph-powered backend after testing.
+  ![alt text](image-2.png)
