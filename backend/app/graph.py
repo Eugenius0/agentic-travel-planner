@@ -77,6 +77,21 @@ def validate_itinerary_node(state: TravelState) -> dict:
             f"budget {request.budget:.2f}."
         )
 
+    if itinerary.cost_breakdown is not None:
+        costs = itinerary.cost_breakdown
+
+        if abs(costs.activities - actual_total) > 0.01:
+            errors.append(
+                "Activity costs in the breakdown do not match "
+                "the itinerary activity total."
+            )
+
+        if costs.total > request.budget + 0.01:
+            errors.append(
+                f"Total trip cost ({costs.total}) exceeds "
+                f"the budget ({request.budget})."
+            )
+
     return {"validation_errors": errors}
 
 

@@ -202,3 +202,11 @@
 - Added an optional cost breakdown to itinerary responses.
 - Added automated tests for travel requests and cost calculations.
 - All 23 backend tests passing.
+
+## Full-Trip Budget Validation
+
+- Added validation for complete trip costs against the user's budget.
+- Ensured activity costs in the breakdown match the itinerary.
+- Added automated tests for exceeding the total budget and inconsistent activity subtotals.
+- Preserved compatibility with existing itineraries.
+- All 25 backend tests passing.

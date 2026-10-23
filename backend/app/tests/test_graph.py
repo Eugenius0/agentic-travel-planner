@@ -213,3 +213,120 @@ def test_validator_rejects_incorrect_total_cost():
 
     assert result["validation_errors"]
     assert any("total" in error.lower() for error in result["validation_errors"])
+
+
+def test_validator_rejects_full_trip_over_budget():
+    from app.graph import validate_itinerary_node
+    from app.schemas import (
+        Activity,
+        DayPlan,
+        TravelItinerary,
+        TravelRequest,
+        TripCostBreakdown,
+    )
+
+    request = TravelRequest(
+        destination="Rome",
+        duration_days=1,
+        budget=500,
+        currency="EUR",
+        interests=["Culture"],
+    )
+
+    itinerary = TravelItinerary(
+        destination="Rome",
+        currency="EUR",
+        days=[
+            DayPlan(
+                day=1,
+                activities=[
+                    Activity(
+                        name="Colosseum",
+                        description="Explore ancient Rome.",
+                        estimated_cost=25,
+                    )
+                ],
+            )
+        ],
+        total_estimated_cost=25,
+        cost_breakdown=TripCostBreakdown(
+            transportation=200,
+            accommodation=300,
+            food=100,
+            activities=25,
+            local_transportation=30,
+        ),
+    )
+
+    result = validate_itinerary_node(
+        {
+            "request": request,
+            "itinerary": itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+            "research_results": "",
+        }
+    )
+
+    assert any(
+        "total trip cost" in error.lower() for error in result["validation_errors"]
+    )
+
+
+def test_validator_rejects_mismatched_activity_subtotal():
+    from app.graph import validate_itinerary_node
+    from app.schemas import (
+        Activity,
+        DayPlan,
+        TravelItinerary,
+        TravelRequest,
+        TripCostBreakdown,
+    )
+
+    request = TravelRequest(
+        destination="Rome",
+        duration_days=1,
+        budget=1000,
+        currency="EUR",
+        interests=["Culture"],
+    )
+
+    itinerary = TravelItinerary(
+        destination="Rome",
+        currency="EUR",
+        days=[
+            DayPlan(
+                day=1,
+                activities=[
+                    Activity(
+                        name="Colosseum",
+                        description="Explore ancient Rome.",
+                        estimated_cost=25,
+                    )
+                ],
+            )
+        ],
+        total_estimated_cost=25,
+        cost_breakdown=TripCostBreakdown(
+            transportation=200,
+            accommodation=300,
+            food=100,
+            activities=50,  # Incorrect: actual activity cost is 25
+            local_transportation=30,
+        ),
+    )
+
+    result = validate_itinerary_node(
+        {
+            "request": request,
+            "itinerary": itinerary,
+            "validation_errors": [],
+            "retry_count": 1,
+            "research_results": "",
+        }
+    )
+
+    assert any(
+        "activity costs in the breakdown" in error.lower()
+        for error in result["validation_errors"]
+    )
