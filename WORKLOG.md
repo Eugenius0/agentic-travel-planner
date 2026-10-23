@@ -246,3 +246,14 @@
 - Added destination photography and reusable card data.
 - Implemented a responsive grid for destination discovery.
 - Identified card sizing and layout issues for the next UI refinement.
+  ![alt text](image.png)
+
+## Interactive Trip Planner
+
+- Implemented a responsive trip-planning form using React and TypeScript.
+- Added departure city, destination, travel dates, traveler count, and budget inputs.
+- Implemented selectable travel interests and travel style preferences.
+- Added client-side form validation and state management.
+- Integrated the planner into the homepage above destination discovery.
+- Verified form interactions and responsive layout.
+  ![alt text](image-1.png)
