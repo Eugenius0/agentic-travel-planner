@@ -246,7 +246,7 @@
 - Added destination photography and reusable card data.
 - Implemented a responsive grid for destination discovery.
 - Identified card sizing and layout issues for the next UI refinement.
-  ![alt text](image.png)
+  ![alt text](images/image.png)
 
 ## Interactive Trip Planner
 
@@ -256,7 +256,7 @@
 - Added client-side form validation and state management.
 - Integrated the planner into the homepage above destination discovery.
 - Verified form interactions and responsive layout.
-  ![alt text](image-1.png)
+  ![alt text](images/image-1.png)
 
 ## Frontend–Backend Integration
 
@@ -276,7 +276,7 @@
 - Confirmed correct travel duration calculation and API response rendering.
 - Verified the integration without consuming external AI API credits.
 - Restored the LangGraph-powered backend after testing.
-  ![alt text](image-2.png)
+  ![alt text](images/image-2.png)
 
 ## Itinerary Results Interface
 
@@ -287,8 +287,8 @@
 - Integrated itinerary results with the trip planner form.
 - Verified the interface using mocked backend responses.
 - Preserved the existing responsive design system.
-  ![alt text](image-3.png)
-  ![alt text](image-4.png)
+  ![alt text](images/image-3.png)
+  ![alt text](images/image-4.png)
 
 ### Complete Trip Budgeting
 
@@ -296,7 +296,7 @@
 - Added full-trip budget validation and feedback-driven LangGraph retries.
 - Updated the frontend with a complete cost breakdown, budget progress indicator, and remaining budget.
 - Verified backend tests (30 passed), TypeScript, and ESLint.
-  ![alt text](image-5.png)
+  ![alt text](images/image-5.png)
 
 ### Successful End-to-End Integration
 
@@ -306,10 +306,10 @@
 - Confirmed the frontend displays real itineraries, source links, and complete trip budget breakdowns.
 - Identified an issue where meal expenses are incorrectly categorized as activities.
 - Next thing is to fix minor bugs in the result and finalizing MVP
-  ![alt text](image-6.png)
-  ![alt text](image-7.png)
-  ![alt text](image-8.png)
-  ![alt text](image-9.png)
+  ![alt text](images/image-6.png)
+  ![alt text](images/image-7.png)
+  ![alt text](images/image-8.png)
+  ![alt text](images/image-9.png)
 
 ### Budget Categorization
 
