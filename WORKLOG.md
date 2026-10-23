@@ -110,7 +110,7 @@
 - Verified successful itinerary generation through the API.
 - Updated API tests to mock LLM responses, keeping tests fast and independent of external services.
 - Confirmed all 4 automated tests pass.
-  ![alt text](image.png)
+  ![alt text](./images/image.png)
 
 ## LangGraph workflow
 
@@ -216,3 +216,12 @@
 - Initialized Next.js with React, TypeScript, Tailwind CSS, and ESLint.
 - Adopted the Next.js App Router for frontend routing.
 - Established the foundation for a responsive travel-planning interface.
+
+## Frontend Design Foundation
+
+- Established a reusable design system with custom colors, spacing, and styling tokens.
+- Configured Geist typography and application metadata.
+- Created a reusable navigation component using Next.js and Lucide React.
+- Implemented the initial responsive homepage with branding and introductory content.
+- Verified the frontend renders successfully in development.
+  ![alt text](./images/image-1.png)
