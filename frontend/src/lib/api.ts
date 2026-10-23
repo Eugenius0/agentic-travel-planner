@@ -16,6 +16,7 @@ export type Activity = {
   description: string;
   estimated_cost: number;
   source_url: string | null;
+  category?: "activity" | "food";
 };
 
 export type DayPlan = {

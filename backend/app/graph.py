@@ -74,6 +74,17 @@ def validate_itinerary_node(state: TravelState) -> dict:
             activity.estimated_cost
             for day in itinerary.days
             for activity in day.activities
+            if activity.category == "activity"
+        ),
+        2,
+    )
+
+    actual_food_total = round(
+        sum(
+            activity.estimated_cost
+            for day in itinerary.days
+            for activity in day.activities
+            if activity.category == "food"
         ),
         2,
     )
@@ -110,6 +121,11 @@ def validate_itinerary_node(state: TravelState) -> dict:
                 f"{costs.total:.2f} {request.currency} "
                 f"exceeds the budget of "
                 f"{request.budget:.2f} {request.currency}."
+            )
+        if costs.food + COST_TOLERANCE < actual_food_total:
+            errors.append(
+                f"Food budget {costs.food:.2f} is lower than the "
+                f"{actual_food_total:.2f} cost of planned meals."
             )
 
     return {"validation_errors": errors}

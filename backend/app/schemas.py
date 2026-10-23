@@ -63,6 +63,7 @@ class Activity(BaseModel):
     description: str
     estimated_cost: float = Field(ge=0)
     source_url: HttpUrl | None = None
+    category: Literal["activity", "food"] = "activity"
 
 
 class TripCostBreakdown(BaseModel):

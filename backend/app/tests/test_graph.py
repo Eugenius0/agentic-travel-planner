@@ -374,3 +374,114 @@ def test_validator_rejects_activity_only_scope():
     )
 
     assert any("budget_scope" in error.lower() for error in result["validation_errors"])
+
+
+def test_food_costs_are_not_counted_as_activities():
+    request = TravelRequest(
+        destination="Uppsala",
+        duration_days=1,
+        budget=50,
+        currency="EUR",
+        interests=["Museums", "Food"],
+    )
+
+    itinerary = TravelItinerary.model_validate(
+        {
+            "destination": "Uppsala",
+            "currency": "EUR",
+            "days": [
+                {
+                    "day": 1,
+                    "activities": [
+                        {
+                            "name": "Museum visit",
+                            "description": "Visit a local museum.",
+                            "estimated_cost": 10,
+                            "category": "activity",
+                        },
+                        {
+                            "name": "Lunch",
+                            "description": "Lunch at a cafe.",
+                            "estimated_cost": 12,
+                            "category": "food",
+                        },
+                    ],
+                }
+            ],
+            "total_estimated_cost": 10,
+            "budget_scope": "full_trip",
+            "cost_breakdown": {
+                "transportation": 18,
+                "accommodation": 0,
+                "food": 12,
+                "activities": 10,
+                "local_transportation": 10,
+            },
+        }
+    )
+
+    state = {
+        "request": request,
+        "research_results": "",
+        "itinerary": itinerary,
+        "validation_errors": [],
+        "retry_count": 1,
+    }
+
+    result = validate_itinerary_node(state)
+
+    assert result["validation_errors"] == []
+    assert itinerary.cost_breakdown.food == 12
+    assert itinerary.cost_breakdown.activities == 10
+    assert itinerary.cost_breakdown.total == 50
+
+
+def test_food_budget_cannot_be_lower_than_planned_meals():
+    request = TravelRequest(
+        destination="Uppsala",
+        duration_days=1,
+        budget=50,
+        currency="EUR",
+        interests=["Food"],
+    )
+
+    itinerary = TravelItinerary.model_validate(
+        {
+            "destination": "Uppsala",
+            "currency": "EUR",
+            "days": [
+                {
+                    "day": 1,
+                    "activities": [
+                        {
+                            "name": "Lunch",
+                            "description": "Lunch at a cafe.",
+                            "estimated_cost": 12,
+                            "category": "food",
+                        }
+                    ],
+                }
+            ],
+            "total_estimated_cost": 0,
+            "budget_scope": "full_trip",
+            "cost_breakdown": {
+                "transportation": 18,
+                "accommodation": 0,
+                "food": 0,
+                "activities": 0,
+                "local_transportation": 10,
+            },
+        }
+    )
+
+    state = {
+        "request": request,
+        "research_results": "",
+        "itinerary": itinerary,
+        "validation_errors": [],
+        "retry_count": 1,
+    }
+
+    result = validate_itinerary_node(state)
+
+    assert any("Food budget" in error for error in result["validation_errors"])

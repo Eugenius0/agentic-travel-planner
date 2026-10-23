@@ -310,3 +310,9 @@
   ![alt text](image-7.png)
   ![alt text](image-8.png)
   ![alt text](image-9.png)
+
+### Budget Categorization
+
+- Added separate food and activity expense categorization.
+- Updated budget validation to prevent meal expenses from being incorrectly allocated to activities.
+- Added regression tests for expense categorization and food budget validation.

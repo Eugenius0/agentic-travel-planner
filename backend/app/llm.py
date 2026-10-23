@@ -77,6 +77,13 @@ def generate_itinerary(
                 "specific activity. Otherwise set source_url to null. "
                 "Return a complete, internally consistent itinerary "
                 "matching the required structured output schema."
+                "Classify every itinerary item using category='activity' or category='food'. "
+                "Restaurants, cafes, breakfast, lunch, dinner, snacks, and drinks must use category='food'. "
+                "Attractions, museums, tours, and experiences must use category='activity'. "
+                "cost_breakdown.activities must equal the sum of estimated_cost for items categorized as activity. "
+                "cost_breakdown.food must include all food items in the itinerary plus any additional estimated meals. "
+                "total_estimated_cost must equal cost_breakdown.activities. "
+                "Never count the same expense in multiple budget categories. "
             )
         ),
         HumanMessage(
