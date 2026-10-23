@@ -225,3 +225,11 @@
 - Implemented the initial responsive homepage with branding and introductory content.
 - Verified the frontend renders successfully in development.
   ![alt text](./images/image-1.png)
+
+## Homepage Landing Section
+
+- Implemented a responsive two-column landing section with destination photography.
+- Added navigation actions and a floating information card.
+- Integrated Next.js Image for optimized image rendering.
+- Organized static assets under `frontend/public/images/`.
+- Verified the homepage renders successfully.
