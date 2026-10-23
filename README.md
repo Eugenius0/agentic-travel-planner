@@ -19,7 +19,7 @@ Watch the Agentic Travel Planner generate a personalized day trip
 from Stockholm to Uppsala, including AI-powered destination research,
 a structured itinerary, and a complete budget breakdown.
 
-[▶ Watch the Demo](docs/showcase/demo.mp4)
+https://github.com/user-attachments/assets/8d1712b1-1caf-48a6-a3aa-5b091810b587
 
 ## Quick Start
 
