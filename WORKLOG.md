@@ -210,3 +210,9 @@
 - Added automated tests for exceeding the total budget and inconsistent activity subtotals.
 - Preserved compatibility with existing itineraries.
 - All 25 backend tests passing.
+
+## Frontend Foundation
+
+- Initialized Next.js with React, TypeScript, Tailwind CSS, and ESLint.
+- Adopted the Next.js App Router for frontend routing.
+- Established the foundation for a responsive travel-planning interface.
